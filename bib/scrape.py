@@ -4,7 +4,7 @@
 
 import os
 import json
-import urllib2
+import urllib.request
 import sqlite3
 
 import logging
@@ -37,7 +37,6 @@ def main():
 def create_db(path_to_db):
     """
     Create SQLite DB.
-
     Parameters
     ----------
     path_to_db : str
@@ -87,14 +86,12 @@ def create_db(path_to_db):
 def get_data(location, weeks=1, nr_type='seatestimate'):
     """
     Get all available data for the given location.
-
     Parameters
     ----------
     location : LSG,LST,LSW,LSM,LSN,LBS,FBC,LAF,FBW,FBM,FBP,FBI,FBA,
                BIB-N,FBH,FBD,TheaBib
     weeks : int
     nr_type : manualcount,seatestimate,wlanclients,ltaports
-
     """
     url = ("http://seatfinder.bibliothek.kit.edu/karlsruhe/getdata.php?"
            "values[0]={table}"
@@ -104,7 +101,10 @@ def get_data(location, weeks=1, nr_type='seatestimate'):
            "&legend[0]=true").format(table=nr_type,
                                      location=location,
                                      weeks=weeks)
-    loaded = json.load(urllib2.urlopen(url))[0][nr_type]
+    request = urllib.request.Request(url)
+    response = urllib.request.urlopen(request)
+    html = response.read()
+    loaded = json.loads(html.decode('utf-8'))[0][nr_type]
     return loaded[location]
 
 
